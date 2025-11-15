@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#D4AF37">
+
+  <!-- Fonts (serif for headings, sans for body) -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- Swiper CSS (kept as in your working code) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+
+  <style>
+    /* ===== Color palette & base ===== */
+    :root{
+      --ivory: #FFFFF0;
+      --champagne: #D4AF37;
+      --blush: #F7DDE2;
+      --lavender: #E6D8F5;
+      --warm: #F5ECE4;
+      --charcoal: #2C3E50;
+      --muted: #6b6b6b;
+      --card-shadow: 0 12px 30px rgba(44,62,80,0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html,body { height:100%; }
+    body{
+      margin:0;
+      font-family: 'Lato', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--ivory) 0%, var(--warm) 100%);
+      color:var(--charcoal);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.5;
+    }
+
+    /* subtle bokeh for dreamy feel */
+    .bokeh {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(212,175,55,0.06) 0 8%, transparent 20%),
+        radial-gradient(circle at 85% 70%, rgba(212,175,55,0.04) 0 6%, transparent 18%);
+      mix-blend-mode: soft-light;
+      z-index:0;
+    }
+
+    main { position:relative; overflow-x:hidden; }
+
+    /* ===== Header (kept your image but improved readability + lowered band) ===== */
+    header {
+      position: relative;
+      background-image: url('https://www.dropbox.com/scl/fi/7ngp9e2gyw2qxczvzufo7/SAVE_20251113_200319.jpg?rlkey=gox5tdyksugpgx8elj1djp40v&raw=1');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      text-align: center;
+      /* increased top padding so header band sits lower and avoids faces */
+      padding: 120px 16px 48px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    /* smaller, elegant band just behind the text (doesn't cover faces) */
+    .header-band{
+      display:inline-block;
+      max-width:920px;
+      padding: 12px 18px;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.28), rgba(0,0,0,0.20));
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(212,175,55,0.08);
+      z-index:2;
+    }
+
+    .names {
+      margin:0;
+      font-family: 'Playfair Display', serif;
+      font-weight:700;
+      font-size:30px; /* slightly reduced for completeness on smaller screens */
+      line-height:1.04;
+      color:#fff;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    }
+    .names .and { display:block; font-size:18px; margin:6px 0 0; font-weight:400; opacity:0.95 }
+    .tagline {
+      margin:8px 0 0;
+      font-size:14px;
+      color: rgba(255,255,255,0.95);
+      font-family:'Lato',sans-serif;
+    }
+
+    /* little floral ornaments (non-intrusive) */
+    .floral{ position:absolute; width:140px; height:140px; opacity:0.85; z-index:1; }
+    .floral.tl{ left:12px; top:12px; transform: rotate(-12deg); }
+    .floral.br{ right:12px; bottom:12px; transform: rotate(16deg); }
+
+    /* ===== Sections & containers ===== */
+    .container { max-width:1100px; margin:0 auto; padding: 0 18px; position:relative; z-index:1; }
+    section { padding:40px 0; }
+
+    h2 { color:var(--charcoal); text-align:center; margin-bottom:18px; font-family:'Playfair Display', serif; font-weight:600; }
+
+    /* ===== Wedding details cards (kept your layout but refined look) ===== */
+    .cards { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,248,246,0.99));
+      border-radius:12px; padding:16px; min-width:220px; flex:1 1 260px;
+      box-shadow: var(--card-shadow); border: 1px solid rgba(212,175,55,0.06);
+      text-align:center;
+    }
+    .card h3 { margin:8px 0 6px; font-family:'Playfair Display', serif; font-size:16px; color:var(--charcoal); }
+    .card p { margin:0; color:var(--muted); font-size:14px; }
+
+    /* ===== Video / media styling - preserved functionality ===== */
+    .media-container { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
+    .media-item { text-align:center; max-width:340px; }
+    .media-item video { width:100%; border-radius:12px; border: 2px solid rgba(212,175,55,0.12); box-shadow:0 10px 30px rgba(0,0,0,0.10); display:block; }
+
+    .caption { text-align:center; margin-top:12px; font-size:14px; color:var(--muted); }
+
+    /* ===== Swiper (photo slideshow) - keep functionality intact ===== */
+    .swiper { width:90%; max-width:860px; margin:20px auto; border-radius:12px; }
+    .swiper-slide img { width:100%; display:block; border-radius:10px; box-shadow:0 10px 26px rgba(0,0,0,0.10); border:1px solid rgba(212,175,55,0.06); }
+
+    /* ===== Maps & RSVP cards (refined visuals) ===== */
+    .map-card, .rsvp-card {
+      background: linear-gradient(180deg,#fff, #fffaf8);
+      border-radius:12px; padding:16px; box-shadow:var(--card-shadow); border:1px solid rgba(212,175,55,0.06); margin-bottom:18px;
+    }
+    .map-title { font-family:'Playfair Display', serif; color:var(--charcoal); display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .map-open { margin-left:auto; font-size:13px; color:var(--champagne); text-decoration:none; border-radius:8px; padding:6px 10px; border:1px solid rgba(212,175,55,0.10); background:linear-gradient(90deg, rgba(212,175,55,0.04), rgba(212,175,55,0.02)); }
+
+    iframe { border-radius:8px; border: none; display:block; width:100%; }
+
+    /* ===== Footer ===== */
+    footer { text-align:center; padding:18px 14px; color:var(--charcoal); background:transparent; font-weight:600; }
+
+    /* small animations (non-functional) */
+    .slide-up { opacity: 0; transform: translateY(16px); transition: all 520ms cubic-bezier(.2,.9,.2,1); }
+    .slide-up.is-visible { opacity:1; transform: translateY(0); }
+
+    /* responsive tweaks */
+    @media (max-width:820px){
+      .names { font-size:24px; }
+      header { padding: 100px 12px 36px 12px; background-position:center top; }
+      .floral{ display:none; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="bokeh" aria-hidden="true"></div>
+
+  <header>
+  <!-- floral ornaments -->
+  <svg class="floral tl" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="none" stroke="#F7DDE2" stroke-width="1.1">
+      <path d="M10,60 C30,10 60,10 80,30" stroke="#E6D8F5" opacity="0.9"/>
+      <circle cx="95" cy="20" r="6" fill="#F7DDE2" opacity="0.95"/>
+    </g>
+  </svg>
+
+  <div class="header-band container" role="banner" aria-label="Heading" style="margin-top:80px; padding:10px 16px;">
+    <!-- names -->
+    <h1 class="names" style="font-size:26px; line-height:1.1;">
+      Ferdinand Onyebuchi Chifu <span class="and" style="font-size:16px;">and</span> Mieebi Charis Ogolomoh
+    </h1>
+    <!-- tagline -->
+    <p class="tagline" style="font-size:13px; line-height:1.4;">
+      Love: A symphony of Hearts playing life's most beautiful tunes. We have found it and we invite you to come celebrate our bond with us.
+    </p>
+  </div>
+
+  <svg class="floral br" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="none" stroke="#F7DDE2" stroke-width="1.1">
+      <path d="M110,80 C90,120 60,120 40,100" stroke="#E6D8F5" opacity="0.9"/>
+      <circle cx="10" cy="100" r="5" fill="#D4AF37" opacity="0.6"/>
+    </g>
+  </svg>
+</header>
+
+  <!-- Couple intro -->
+  <section>
+    <div class="container slide-up">
+      <div style="text-align:center; max-width:620px; margin:auto;">
+        <p style="color:var(--muted); font-size:15px; margin-bottom:6px;">#FEBI</p>
+        <p style="color:var(--muted); margin-top:0;">Yenegoa, Bayelsa State</p>
+        <h3 style="font-family:'Playfair Display', serif; font-size:22px; margin-top:10px;">Saturday, 29 November 2025</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wedding Details -->
+  <section style="background:transparent;">
+    <div class="container">
+      <h2>Wedding Details</h2>
+      <div class="cards">
+        <div class="card slide-up">
+          <div style="font-size:22px;">📅</div>
+          <h3>Wedding Date</h3>
+          <p>Saturday, 29 Nov 2025</p>
+        </div>
+
+        <div class="card slide-up">
+          <div style="font-size:22px;">🎨</div>
+          <h3>Colors</h3>
+          <p>dusty pink, purple, navy blue and white</p>
+        </div>
+
+        <div class="card slide-up">
+          <div style="font-size:22px;">💒</div>
+          <h3>Wedding Venue</h3>
+          <p>Christ Embassy The Prolific Church, Azikoro Road Ekeki, Yenegoa</p>
+        </div>
+
+        <div class="card slide-up">
+          <div style="font-size:22px;">🎉</div>
+          <h3>Trad Venue</h3>
+          <p>Azikoro Village, Yenegoa</p>
+        </div>
+
+        <div class="card slide-up">
+          <div style="font-size:22px;">🌦️</div>
+          <h3>Weather Forecast</h3>
+          <p>28°C / 24°C (sunny day)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO SECTION (unchanged functionality) -->
+  <section>
+    <div class="container">
+      <h2>Our Journey</h2>
+      <div class="media-container">
+        <div class="media-item slide-up" aria-hidden="false">
+          <!-- VIDEO SRC left exactly as in your working code -->
+          <video controls>
+            <source src="https://www.dropbox.com/scl/fi/rg3kujlezxqxwn6xfa2fy/27feb40bb1dd4988b8e3e5b3c714f33b.mp4?rlkey=uew65t177gvihak0umb5v12fb&dl=1" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <p class="caption">Special Moments</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHOTO SLIDESHOW SECTION (kept exactly as-is except visual container) -->
+  <section id="photo-slideshow">
+    <div class="container">
+      <h2>Photo Slideshow</h2>
+
+      <div class="swiper mySwiper slide-up" aria-label="Photo slideshow">
+        <div class="swiper-wrapper">
+          <!-- kept your original Dropbox image URLs exactly -->
+          <div class="swiper-slide">
+            <img src="https://www.dropbox.com/scl/fi/w7c2ojeyzqw4hdzurmj6r/SAVE_20251113_200330.jpg?rlkey=bjetx77tfg2eqt8gw9tjz04gm&raw=1" alt="Photo 1">
+          </div>
+          <div class="swiper-slide">
+            <img src="https://www.dropbox.com/scl/fi/94vvqnlyux418f51gh826/SAVE_20251113_200342.jpg?rlkey=fpdsw6exduh10b5i0zaw7m8tr&raw=1" alt="Photo 2">
+          </div>
+          <div class="swiper-slide">
+            <img src="https://www.dropbox.com/scl/fi/7ngp9e2gyw2qxczvzufo7/SAVE_20251113_200319.jpg?rlkey=gox5tdyksugpgx8elj1djp40v&raw=1" alt="Photo 3">
+          </div>
+          <div class="swiper-slide">
+            <img src="https://www.dropbox.com/scl/fi/hy66gu5zqra6rjfrcp9pc/images-2.jpeg?rlkey=yvn8osx5itwgvkw7uvs9dvjql&raw=1" alt="Photo 4">
+          </div>
+        </div>
+
+        <!-- Controls (kept your Swiper controls) -->
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAPS (unchanged functional srcs) -->
+  <section>
+    <div class="container">
+      <h2>Map Directions</h2>
+      <div class="map-card slide-up">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <div class="map-title">Wedding Venue</div>
+          <a class="map-open" href="https://maps.app.goo.gl/6btKXt9F2M9XqeD99" target="_blank" rel="noopener">Open in Google Maps</a>
+        </div>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.926947044745!2d6.347259774985899!3d4.931677140240122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1067b13981fd7a47%3A0x22b27d3b2b9c84e0!2sChrist%20Embassy%20Zonal%20Church%20Headquarters%2C%20Yenagoa%20Bayelsa%20State!5e0!3m2!1sen!2sng!4v1717350000000!5m2!1sen!2sng"
+          width="100%" height="400" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+
+      <div class="map-card slide-up">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <div class="map-title">Trad Venue</div>
+          <a class="map-open" href="https://maps.app.goo.gl/YFJsfkEUsHuWveyG9" target="_blank" rel="noopener">Open in Google Maps</a>
+        </div>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.0758329629097!2d6.343974075094535!3d4.909318140645294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1067b12e596bd5cd%3A0x4fa1dd0c305e6a8e!2sAzikoro%20Village%20Rd%2C%20Yenagoa!5e0!3m2!1sen!2sng!4v1717350000000!5m2!1sen!2sng"
+          width="100%" height="400" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- RSVP (kept exact embed link) -->
+  <section id="rsvp" style="background:transparent;">
+    <div class="container">
+      <h2>RSVP & Guest Feedback</h2>
+      <div class="rsvp-card slide-up">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+          <div style="font-family:'Playfair Display', serif; color:var(--champagne); font-weight:600;">💌 RSVP</div>
+          <div style="color:var(--muted); font-size:13px;">Please confirm your attendance and dietary info.</div>
+        </div>
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSdM88KHVnEU7B5LWzk5Q0H5uPq_N8MsI4u0V1HyqGnF7wN3NA/viewform?embedded=true"
+          width="100%" height="900" loading="lazy"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="text-align:center;">
+      <p>Made with love by Ferdinand & Mieebi ❤️ | FEBI 2025</p>
+    </div>
+  </footer>
+</main>
+
+<!-- Swiper JS (kept as in your working code) -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+<script>
+  // initialize Swiper (kept your configuration)
+  const swiper = new Swiper(".mySwiper", {
+    loop: true,
+    autoplay: { delay: 3000, disableOnInteraction: false },
+    pagination: { el: ".swiper-pagination", clickable: true },
+    navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+    slidesPerView: 1,
+    spaceBetween: 10,
+  });
+
+  // reveal animation for slide-up elements (visual only)
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.slide-up').forEach((el, i) => {
+      setTimeout(()=> el.classList.add('is-visible'), 90 * i);
+    });
+  });
+
+  // keep service worker registration (unchanged)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+</script>
+
+</body>
+</html>
